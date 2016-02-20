@@ -1,7 +1,8 @@
 #!/bin/bash
-sudo apt-get -y install postgresql-9.4-postgis-2.1
-sudo apt-get -y install vim
-sudo apt-get -y install curl
+apt-get -y install postgresql-9.4-postgis-2.1
+apt-get -y install vim
+apt-get -y install curl
+apt-get -y install zip
 
 SRTM_USER=srtm
 SRTM_PASS=srtm
@@ -9,6 +10,8 @@ SRTM_DB=srtm
 PG_HBA=/etc/postgresql/9.4/main/pg_hba.conf
 PG_CONF=/etc/postgresql/9.4/main/postgresql.conf
 RASTER_DIR=/vagrant/out/
+RASTER_SERVER=http://mafreebox.freebox.fr/share/bR4v-TAcEYjBEqwj/
+#RASTER_SERVER=http://srtm.csi.cgiar.org/SRT-ZIP/SRTM_V41/SRTM_Data_GeoTiff/
 
 # allow external connexions
 sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" "$PG_CONF"
@@ -33,12 +36,17 @@ psql -U srtm -c "SELECT postgis_full_version();"
 
 # raster2pgsql -s 4326 -d -Y -I -t 30x30 out/*.tif srtm_metro |psql -U srtm -d srtm
 
+rasterName=srtm_36_03
+echo Downloading raster ${rasterName}...
+curl -silent -o ${RASTER_DIR}${rasterName}.zip  ${RASTER_SERVER}${rasterName}.zip
+unzip -p ${RASTER_DIR}${rasterName}.zip ${rasterName}.tif > ${RASTER_DIR}${rasterName}.tif
+
 # -d suppression de la table, -I créer un index, -Y mode copy, -t tile size
-raster2pgsql -s 4326 -d -Y -I -t 30x30 $RASTER_DIR/srtm_36_03.tif srtm_metro |psql -U srtm -d srtm
+raster2pgsql -s 4326 -d -Y -I -t 30x30 $RASTER_DIR${rasterName}.tif srtm_metro |psql -U srtm -d srtm
 
 # testing a point (France Bretagne)
-psql -U srtm -c "WITH point AS ( SELECT 'Bretagne' as lieu, st_geomfromtext('POINT (-3.94316 48.24974)', 4326) AS geom)
-SELECT point.lieu, st_value(rast, geom) as alt, st_summarystats(srtm.rast) as stats
+psql -U srtm -c "WITH point AS ( SELECT 'Bretagne (Menez-Hom)' as lieu, st_geomfromtext('POINT (-4.23425 48.22016)', 4326) AS geom)
+SELECT point.lieu, st_value(rast, geom) as altitude, st_summarystats(srtm.rast) as statistiques
 FROM point
 JOIN srtm_metro srtm ON st_intersects(srtm.rast, point.geom)
 ;"
