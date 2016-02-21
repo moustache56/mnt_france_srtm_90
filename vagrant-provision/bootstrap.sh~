@@ -17,8 +17,8 @@ PG_CONF=/etc/postgresql/9.4/main/postgresql.conf
 RASTER_DIR=/vagrant/rasters/
 
 # Local solution to avoid downloading on the NET  (70 Mo each tile)
-# RASTER_SERVER=http://mafreebox.freebox.fr/share/bR4v-TAcEYjBEqwj/
-RASTER_SERVER=http://srtm.csi.cgiar.org/SRT-ZIP/SRTM_V41/SRTM_Data_GeoTiff/
+RASTER_SERVER=http://mafreebox.freebox.fr/share/bR4v-TAcEYjBEqwj/
+#RASTER_SERVER=http://srtm.csi.cgiar.org/SRT-ZIP/SRTM_V41/SRTM_Data_GeoTiff/
 
 # allow external connexions
 sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" "$PG_CONF"
