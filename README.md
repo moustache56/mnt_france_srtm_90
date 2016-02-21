@@ -1,5 +1,13 @@
 # Modèle Numérique de Terrain (SRTM 90) avec Postgis
 
+## Description
+
+Crée une machine virtuelle avec postgreSQL et postGIS (vagrant)
+Télécharge 2 tuiles SRTM (Bretagne et Corse).
+Les intègre dans Postgis (raster2pgsql)
+
+## Installation
+
 Installation de vagrant préalable, VM 64 bits. https://www.vagrantup.com/
 
 ```bash
@@ -8,12 +16,13 @@ cd mnt_france_srtm_90
 vagrant up
 ```
 
-Connexion possible depuis l'hôte : 
+Il est possible de se connecter depuis l'hôte : 
 ```bash
 psql -U srtm -p 5434
 ```
-
 Détails de l'installation : [bootstrap.sh](./vagrant-provision/bootstrap.sh)
+
+## Résultat
 
 Tuiles pré-chargées -> bretagne et corse :
 ```sql
