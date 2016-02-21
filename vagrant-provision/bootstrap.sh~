@@ -24,7 +24,7 @@ RASTER_SERVER=http://mafreebox.freebox.fr/share/bR4v-TAcEYjBEqwj/
 sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" "$PG_CONF"
 cp /etc/postgresql/9.4/main/pg_hba.conf /etc/postgresql/9.4/main/pg_hba.conf.old
 sed -i 's/^local\s\+all\s\+all\s\+peer/local all all trust/g' $PG_HBA #local
-echo "host    all             all             all                     md5" >> "$PG_HBA"
+sed -i 's/^host\s\+all\s\+all\s\+\(.*\)\s\+md5/host all all  trust/g' $PG_HBA #host
 
 # restart for taking effect from previous command
 service postgresql restart
