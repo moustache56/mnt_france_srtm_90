@@ -60,3 +60,23 @@ psql -U srtm -c "WITH point AS (
 )
 SELECT point.lieu, st_value(rast, geom) as altitude, st_summarystats(srtm.rast) as statistiques
 FROM point JOIN srtm_metro srtm ON st_intersects(srtm.rast, point.geom);"
+
+#testing statistics for smallest french administrative layer (commune) of a french departement
+
+psql -U srtm -c "WITH zone AS (
+SELECT
+id_unite_niv3,
+st_transform(geom, 4326)::geometry(MultiPolygon, 4326) AS geom
+FROM zone3
+WHERE id = 1
+), cropped AS (
+SELECT
+st_clip(st_union(r.rast), min(z.geom)) AS rast,
+min(geom) AS geom
+FROM zone z
+JOIN srtm_france r ON st_intersects(z.geom, r.rast)
+)
+SELECT s.*, st_AStext(geom)
+FROM cropped c
+, st_summarystats(c.rast) s"
+
